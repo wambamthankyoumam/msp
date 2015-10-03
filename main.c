@@ -1,22 +1,34 @@
 #include <msp430.h> 
 
+
+#pragma vector=TIMER0_A0_VECTOR
+__interrupt void timerA(void) {
+	P1OUT ^= BIT0;
+}
+
+
 int tits = 0;
 #pragma vector=PORT1_VECTOR        // throw code for button press timer in this interupt
 __interrupt void p1(void){
 	if(P1IFG & BIT3 & P1IES)
 	{
 
-		P1OUT ^= BIT0;
+		//P1OUT ^= BIT0;
 		P1IES ^= BIT3;		// toggle the interrupt edge
 		P1IFG &= ~BIT3;    // clear the bit3 interrupt flag
-		//TA1CCR0 = 8200; 	//triger timer every 2 secs
+		TA0CCR0 = 2500; 	//triger timer every .5 secs
+		TAR = 0;
 	}
 	else
 	{
-		tits = 1;
-		P1OUT ^= BIT0;
+
+		//P1OUT ^= BIT0;
 		P1IES ^= BIT3;
 		P1IFG &= ~BIT3;
+		TA0CCR0 = 0;
+
+
+		//TAR = 0;
 	}
 
 
@@ -32,13 +44,15 @@ int main(void) {
     P1DIR = 0xFF;
     P1OUT = 0;
 
+    //  P2SEL = 0;
+    //  P2DIR = 0xFF;
+    //  P2OUT = 0;
+
 	P2DIR = ~XIN;
 	P2OUT = 0;
 	P2SEL = XIN | XOUT;
 
-    P2SEL = 0;
-    P2DIR = 0xFF;
-    P2OUT = 0;
+
 
 	//Set up the crystal oscillator as the clock
 	//ACLK divider is 0
@@ -50,7 +64,7 @@ int main(void) {
 	//Set to mode 1 (count up to TACCR0), divide by 8, input is ACLK, interrupt enabled
 	TA0CTL = MC_1 | TASSEL_1 | ID_3;
 	//Trigger 4000 times per second
-	TA0CCR0 = 0;							// NEED TO CHANGE THIS IN TIMER INTRP
+	//TA0CCR0 = 4000;							// NEED TO CHANGE THIS IN TIMER INTRP
 	TA0CCTL0 |= CCIE;
 
     //Set up the push button as input
