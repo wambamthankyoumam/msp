@@ -1,13 +1,22 @@
 #include <msp430.h> 
 
+int tits = 0;
 #pragma vector=PORT1_VECTOR        // throw code for button press timer in this interupt
 __interrupt void p1(void){
-	if(P1IFG & BIT3)
+	if(P1IFG & BIT3 & P1IES)
 	{
 
 		P1OUT ^= BIT0;
 		P1IES ^= BIT3;		// toggle the interrupt edge
 		P1IFG &= ~BIT3;    // clear the bit3 interrupt flag
+		//TA1CCR0 = 8200; 	//triger timer every 2 secs
+	}
+	else
+	{
+		tits = 1;
+		P1OUT ^= BIT0;
+		P1IES ^= BIT3;
+		P1IFG &= ~BIT3;
 	}
 
 
