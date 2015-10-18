@@ -26,6 +26,10 @@ __interrupt void p1(void){
 		TA0CCR0 = 0;
 		TAR = 0;
 
+		if(P1OUT & BIT0)  //
+		{					//
+			P1OUT ^= BIT0;	//
+		}					//
 	}
 
 }
